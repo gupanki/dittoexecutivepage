@@ -35,8 +35,8 @@ All colors MUST be HSL.
     --success: 142 76% 36%;
     --success-foreground: 355.7 100% 97.3%;
 
-    --warning: 217 91% 60%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 213 27% 84%;
+    --warning-foreground: 222.2 84% 4.9%;
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
@@ -44,7 +44,7 @@ All colors MUST be HSL.
 
     --chart-1: 221 83% 53%;
     --chart-2: 142 76% 36%;
-    --chart-3: 217 91% 60%;
+    --chart-3: 213 27% 84%;
     --chart-4: 0 84.2% 60.2%;
     --chart-5: 270 95% 75%;
 
@@ -91,6 +91,9 @@ All colors MUST be HSL.
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+
+    --warning: 213 27% 50%;
+    --warning-foreground: 210 40% 98%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
