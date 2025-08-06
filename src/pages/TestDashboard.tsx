@@ -101,6 +101,10 @@ export default function TestDashboard() {
     const totalFailed = currentMetrics.reduce((sum, m) => sum + m.failedRuns, 0);
     const overallSuccessRate = totalRuns > 0 ? totalSuccessful / totalRuns : 0;
     const averageCost = totalRuns > 0 ? totalCost / totalRuns : 0;
+    
+    // Calculate average duration
+    const totalDuration = filteredCurrentData.reduce((sum, test) => sum + test.duration, 0);
+    const averageDuration = filteredCurrentData.length > 0 ? totalDuration / filteredCurrentData.length : 0;
 
     return {
       totalRuns,
@@ -110,8 +114,9 @@ export default function TestDashboard() {
       totalSuccessful,
       totalFailed,
       uniqueTests: currentMetrics.length,
+      averageDuration,
     };
-  }, [currentMetrics]);
+  }, [currentMetrics, filteredCurrentData]);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -119,7 +124,7 @@ export default function TestDashboard() {
         {/* Header */}
         <div className="flex flex-col space-y-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Test Execution Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Ditto Executive Summary</h1>
             <p className="text-muted-foreground">
               Monitor test performance, costs, and trends across your test suite
             </p>
@@ -146,7 +151,7 @@ export default function TestDashboard() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
@@ -170,6 +175,18 @@ export default function TestDashboard() {
               <p className="text-xs text-muted-foreground">
                 {summaryStats.totalSuccessful} successful, {summaryStats.totalFailed} failed
               </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Average Time</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {summaryStats.averageDuration.toFixed(1)}s
+              </div>
+              <p className="text-xs text-muted-foreground">Per test execution</p>
             </CardContent>
           </Card>
           
@@ -245,6 +262,13 @@ export default function TestDashboard() {
 
           <TabsContent value="comparison" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Current Period</label>
+                <DateRangePicker 
+                  date={currentDateRange} 
+                  onDateChange={setCurrentDateRange} 
+                />
+              </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Comparison Period</label>
                 <DateRangePicker 
