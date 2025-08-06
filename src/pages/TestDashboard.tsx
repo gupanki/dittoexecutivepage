@@ -15,6 +15,9 @@ import { TestNameFilter } from "@/components/test-name-filter";
 import { TestMetricsTable } from "@/components/test-metrics-table";
 import { TimelineChart } from "@/components/timeline-chart";
 import { ComparisonView } from "@/components/comparison-view";
+import { StatusCards } from "@/components/status-cards";
+import { SuccessRatePieChart } from "@/components/success-rate-pie-chart";
+import { CostTrendChart } from "@/components/cost-trend-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -204,6 +207,20 @@ export default function TestDashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            <StatusCards 
+              metrics={currentMetrics} 
+              totalRuns={summaryStats.totalRuns}
+              overallSuccessRate={summaryStats.overallSuccessRate}
+            />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SuccessRatePieChart 
+                totalSuccessful={summaryStats.totalSuccessful}
+                totalFailed={summaryStats.totalFailed}
+              />
+              <CostTrendChart data={timelineData} />
+            </div>
+            
             <TimelineChart data={timelineData} />
             
             <Card>
