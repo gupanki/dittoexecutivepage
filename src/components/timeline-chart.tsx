@@ -39,6 +39,10 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
             <span className="font-medium">{data.runs}</span>
           </p>
           <p className="flex justify-between gap-4">
+            <span className="text-muted-foreground">Total Cost:</span>
+            <span className="font-medium">${data.totalCost.toFixed(2)}</span>
+          </p>
+          <p className="flex justify-between gap-4">
             <span className="text-muted-foreground">Avg Cost:</span>
             <span className="font-medium">${data.averageCost.toFixed(4)}</span>
           </p>
@@ -55,12 +59,13 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label })
 };
 
 export function TimelineChart({ data, className }: TimelineChartProps) {
-  const maxRuns = Math.max(...data.map(d => d.runs));
+  const maxCost = Math.max(...data.map(d => d.averageCost));
   
-  // Add color based on activity level
+  // Add color based on cost level
   const chartData = data.map(item => ({
     ...item,
-    activityLevel: item.runs / maxRuns
+    costLevel: item.averageCost / maxCost,
+    totalCost: item.averageCost * item.runs
   }));
 
   return (
@@ -68,7 +73,7 @@ export function TimelineChart({ data, className }: TimelineChartProps) {
       <CardHeader>
         <CardTitle>Test Activity Timeline</CardTitle>
         <CardDescription>
-          Daily test execution volume with success rates and costs
+          Daily cost analysis with execution volume and success rates
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,11 +89,12 @@ export function TimelineChart({ data, className }: TimelineChartProps) {
             <YAxis 
               tick={{ fontSize: 12 }}
               stroke="hsl(var(--foreground))"
-              label={{ value: 'Number of Runs', angle: -90, position: 'insideLeft' }}
+              tickFormatter={(value) => `$${value.toFixed(3)}`}
+              label={{ value: 'Total Daily Cost ($)', angle: -90, position: 'insideLeft' }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Bar 
-              dataKey="runs" 
+              dataKey="totalCost" 
               radius={[2, 2, 0, 0]}
               fill="hsl(var(--primary))"
               opacity={0.8}
@@ -100,7 +106,7 @@ export function TimelineChart({ data, className }: TimelineChartProps) {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-primary rounded"></div>
-              <span>Test Runs</span>
+              <span>Daily Cost</span>
             </div>
           </div>
           <span>Hover over bars for detailed metrics</span>
