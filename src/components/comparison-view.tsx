@@ -96,7 +96,7 @@ export function ComparisonView({
   ];
 
   const getChangeIcon = (current: number, previous: number, isHigherBetter = true) => {
-    if (previous === 0) return <Minus className="h-4 w-4 text-muted-foreground" />;
+    if (previous === 0 || current === previous) return <Minus className="h-4 w-4 text-muted-foreground" />;
     
     const isIncreasing = current > previous;
     const isPositiveChange = isHigherBetter ? isIncreasing : !isIncreasing;
@@ -110,11 +110,12 @@ export function ComparisonView({
 
   const getChangePercent = (current: number, previous: number) => {
     if (previous === 0) return "N/A";
+    if (current === previous) return "0.0%";
     return `${(((current - previous) / previous) * 100).toFixed(1)}%`;
   };
 
   const getChangeColor = (current: number, previous: number, isHigherBetter = true) => {
-    if (previous === 0) return "text-muted-foreground";
+    if (previous === 0 || current === previous) return "text-muted-foreground";
     
     const isIncreasing = current > previous;
     const isPositiveChange = isHigherBetter ? isIncreasing : !isIncreasing;
