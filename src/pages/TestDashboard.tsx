@@ -3,13 +3,17 @@ import { DateRange } from "react-day-picker";
 import { subDays, subMonths, startOfMonth, endOfMonth } from "date-fns";
 
 import {
-  generateMockData,
   calculateTestMetrics,
   generateTimelineData,
   filterDataByDateRange,
   filterDataByTestNames,
   TestExecution,
 } from "@/lib/test-data";
+import { useTestData } from "@/hooks/useTestData";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/date-range-picker";
 import { TestNameFilter } from "@/components/test-name-filter";
 import { TestMetricsTable } from "@/components/test-metrics-table";
@@ -21,9 +25,11 @@ import { CostTrendChart } from "@/components/cost-trend-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { TestDataUploader } from "@/components/TestDataUploader";
 
 export default function TestDashboard() {
-  const [allData] = React.useState<TestExecution[]>(() => generateMockData());
+  const { data: allData, loading, error, refetch } = useTestData();
+  const { toast } = useToast();
   
   const [currentDateRange, setCurrentDateRange] = React.useState<DateRange | undefined>(() => ({
     from: subDays(new Date(), 29),
@@ -118,13 +124,79 @@ export default function TestDashboard() {
     };
   }, [currentMetrics, filteredCurrentData]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-96" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-7xl mx-auto">
+          <Card className="border-destructive/20 bg-destructive/5">
+            <CardContent className="flex items-center gap-4 p-6">
+              <AlertCircle className="h-8 w-8 text-destructive" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-destructive">Error Loading Data</h3>
+                <p className="text-muted-foreground">{error}</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Make sure you're authenticated and have permission to access test data.
+                </p>
+              </div>
+              <Button onClick={refetch} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Retry
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (allData.length === 0) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-7xl mx-auto">
+          <Card className="text-center p-12">
+            <CardContent>
+              <h3 className="text-xl font-semibold mb-2">No Test Data Found</h3>
+              <p className="text-muted-foreground mb-4">
+                Start by adding some test execution data to see your dashboard analytics.
+              </p>
+              <Button onClick={refetch} variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col space-y-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Ditto Executive Summary</h1>
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+              Ditto Executive Summary
+            </h1>
             <p className="text-muted-foreground">
               Monitor test performance, costs, and trends across your test suite
             </p>
@@ -221,6 +293,7 @@ export default function TestDashboard() {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="comparison">Comparison</TabsTrigger>
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="data">Add Data</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -373,6 +446,10 @@ export default function TestDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="data" className="space-y-6">
+            <TestDataUploader />
           </TabsContent>
         </Tabs>
       </div>
